@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import css from './Modal.module.css';
 
 const Modal = ({ imageURL: propsImageURL, largeImageURL }) => {
@@ -8,25 +8,27 @@ const Modal = ({ imageURL: propsImageURL, largeImageURL }) => {
   const handleImageClick = imageURL => {
     setIsOpen(true);
     setImageURL(imageURL);
-    document.addEventListener('keydown', handleEscKey);
   };
 
   const handleCloseModal = () => {
     setIsOpen(false);
-    document.removeEventListener('keydown', handleEscKey);
   };
 
-  const handleEscKey = event => {
+  const handleEscKey = useCallback(event => {
     if (event.key === 'Escape') {
       handleCloseModal();
     }
-  };
+  }, []);
 
   useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscKey);
+    }
+
     return () => {
       document.removeEventListener('keydown', handleEscKey);
     };
-  }, []);
+  }, [isOpen, handleEscKey]);
 
   return (
     <div>
